@@ -63,9 +63,12 @@ public class Client<M extends IRootModel> extends AsyncTask<BasicNameValuePair, 
             M model = getInstance();
             List<BasicNameValuePair> paramArray = Arrays.asList(params);
 
-            String url = model.getBaseUrl()
-                    + "?"
+            String url = model.getBaseUrl();
+
+            if (paramArray.size() > 0) {
+                url += "?"
                     + URLEncodedUtils.format(paramArray, "utf-8");
+            }
             HttpGet getRequest = new HttpGet(url);
             HttpClient httpClient = new DefaultHttpClient();
             HttpResponse response = httpClient.execute(getRequest);
