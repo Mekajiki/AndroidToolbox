@@ -132,7 +132,13 @@ public class Client<M extends IRootModel> extends AsyncTask<BasicNameValuePair, 
             M model = getInstance();
             JSONArray attrsArray;
             if (json.getClass() == JSONObject.class) {
-                attrsArray = ((JSONObject)json).getJSONArray(model.getJsonRoot());
+                if (model.getJsonRoot() != null) {
+                    attrsArray = ((JSONObject)json).getJSONArray(model.getJsonRoot());
+                }
+                else {
+                    attrsArray = new JSONArray();
+                    attrsArray.put(json);
+                }
             }
             else {
                 attrsArray = (JSONArray)json;
