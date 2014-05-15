@@ -88,8 +88,15 @@ public class Client<M extends IRootModel> extends AsyncTask<BasicNameValuePair, 
             response.getEntity().writeTo(stream);
             String jsonString = stream.toString();
 
-            JSONObject json = new JSONObject(jsonString);
-            List<M> models = parser.parse(json);
+            Object json;
+            if (model.getJsonRootClass() == JSONObject.class) {
+                json = new JSONObject(jsonString);
+            }
+            else {
+                json = new JSONArray(jsonString);
+            }
+            List<M> models = parser.parseJsonObject(json);
+
             return AsyncTaskResult.createSuccessResult(models);
         }
         catch (ClientProtocolException e) {
@@ -121,9 +128,15 @@ public class Client<M extends IRootModel> extends AsyncTask<BasicNameValuePair, 
         }
 
         @Override
-        public List<M> parse(JSONObject json) throws IllegalAccessException, InstantiationException, JSONException {
+        public List<M> parseJsonObject(Object json) throws IllegalAccessException, InstantiationException, JSONException {
             M model = getInstance();
-            JSONArray attrsArray = json.getJSONArray(model.getJsonRoot());
+            JSONArray attrsArray;
+            if (json.getClass() == JSONObject.class) {
+                attrsArray = ((JSONObject)json).getJSONArray(model.getJsonRoot());
+            }
+            else {
+                attrsArray = (JSONArray)json;
+            }
 
             List<M> models = new ArrayList<M>(attrsArray.length());
             for (int i = 0; i < attrsArray.length(); i++) {
